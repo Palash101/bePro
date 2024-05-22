@@ -22,3 +22,11 @@ Route::group([
     Route::post('register', 'App\Http\Controllers\AppController@register');
 });
 
+Route::group([
+    'middleware' => ['cors','auth:api','user:active'],
+    'prefix' => 'auth'
+], function ($router) {
+    Route::get('profile', 'App\Http\Controllers\AppController@profile');
+    Route::post('profile/update', 'App\Http\Controllers\AppController@profileUpdate');
+});
+

@@ -7,8 +7,12 @@ use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Auth;
 use JWTAuth;
+use App\Http\Resources\UserResource;
+use App\Http\Traits\FileUpload;
 class AppController extends Controller
 {
+    use FileUpload;
+
     public function __construct()
     {    
         $this->middleware('auth:api', ['except' => ['login','register']]);
@@ -17,9 +21,7 @@ class AppController extends Controller
     public function register(Request $request)
     {
        $request->validate([
-        
         'email' => 'required|email|unique:users',
-        
         'password' => 'required|min:8'
         ]);
 
@@ -44,7 +46,7 @@ class AppController extends Controller
             return response()->json([
                 'message' => 'User register successfully',
                 'token' => $token,
-                'user' => $user, // you can ommit this
+                'user' => new UserResource($user), // you can ommit this
             ]);       
         }
         
@@ -77,7 +79,6 @@ class AppController extends Controller
 
     protected function respondWithTokenDetails($token)
     {
-        
         return [
 
             'user' => $this->guard()->user(),
@@ -96,6 +97,65 @@ class AppController extends Controller
     public function guard()
     {
         return Auth::guard('api');
+    }
+
+    public function profile(Request $request)
+    {   
+        $user = $this->guard()->user();
+        try {
+            $user = User::findOrFail($user->id);
+            return response(['status' => 'success','user' => new UserResource($user)],200);
+        
+        } catch (\Exception $e) {
+            
+              return response(['status' => 'error','msg' => 'Something went wrong','dev_msg' => $e->getMessage()],404);
+
+        }
+
+    }
+
+    public function profileUpdate(Request $request)
+    {
+        $user = $this->guard()->user();
+        try {
+        $data = $request->all();
+        $user = User::findOrFail($user->id);
+         if($user)
+           {    
+            if ($request->hasFile('profile')) {
+                $pathToUpload = 'uploads/user/';
+                $file = $request->file('profile');
+                $data['profile'] = $this->uploadFile($pathToUpload, $file);
+            }
+            if ($request->hasFile('banner')) {
+                $pathToUpload = 'uploads/user/';
+                $file = $request->file('banner');
+                $data['banner'] = $this->uploadFile($pathToUpload, $file);
+            }
+            if ($request->gender) {
+                $data['gender'] = $request->gender;
+            }
+            if ($request->name) {
+                $data['name'] = $request->name;
+            }
+            if ($request->phone) {
+                $data['phone'] = $request->phone;
+            }
+            if ($request->dob) {
+                $data['dob'] = $request->dob;
+            }
+            if ($request->address) {
+                $data['address'] = $request->address;
+            }
+            $user->update($data);
+            return response(['status' => 'success' ,'user' => new UserResource($user),'message' => 'Profile updated successfully'], 200);
+        }
+
+        } catch (\Exception $e) {
+         
+        return response(['status' => 'error','message' => 'Something went wrong!','dev_msg' => $e->getMessage()],403);        
+
+        }
     }
 }
 
