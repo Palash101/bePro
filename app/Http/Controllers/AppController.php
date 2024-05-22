@@ -18,11 +18,9 @@ class AppController extends Controller
     {
        $request->validate([
         
-        'name' => 'required|string',
         'email' => 'required|email|unique:users',
-        'dob' => 'required|date', 
-        'gender' => 'required|in:Male,Female',
-        'password' => 'required|min:8|confirmed'
+        
+        'password' => 'required|min:8'
         ]);
 
         try {
@@ -30,6 +28,7 @@ class AppController extends Controller
         $data = $request->all();           
 
         $data['password'] = bcrypt($data['password']); 
+        $data['status'] = 1; 
 
         $user = User::create($data);             
         $role = Role::find(2);
