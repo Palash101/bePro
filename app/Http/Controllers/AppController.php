@@ -22,9 +22,10 @@ class AppController extends Controller
     {
        $request->validate([
         'email' => 'required|email|unique:users',
-        'username' => 'required|username|unique:users',
+        //'username' => 'required|username|unique:users',
         'password' => 'required|min:8'
         ]);
+
 
         try {
 
@@ -46,9 +47,8 @@ class AppController extends Controller
 
             return response()->json([
                 'message' => 'User register successfully',
-                'token' => $token,
                 'user' => new UserResource($user), // you can ommit this
-            ]);       
+            ])->header('token', $token);       
         }
         
         } catch (\Exception $e) {         
@@ -75,15 +75,13 @@ class AppController extends Controller
 
     protected function respondWithToken($token)
     {
-        return response()->json($this->respondWithTokenDetails($token));
+        return response()->json($this->respondWithTokenDetails($token))->header('token', $token);
     }
 
     protected function respondWithTokenDetails($token)
     {
         return [
-
-            'user' => $this->guard()->user(),
-            'access_token' => $token,
+            'user' => new UserResource($this->guard()->user()),
             'token_type' => 'bearer',
             'expires_in' => $this->guard()->factory()->getTTL() * 60
 
