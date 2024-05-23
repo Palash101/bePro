@@ -22,6 +22,7 @@ class AppController extends Controller
     {
        $request->validate([
         'email' => 'required|email|unique:users',
+        'username' => 'required|username|unique:users',
         'password' => 'required|min:8'
         ]);
 
