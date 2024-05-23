@@ -7,9 +7,11 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Modules\Packages\App\Models\Packages;
-
+use App\Http\Traits\FileUpload;
 class PackagesController extends Controller
 {
+    use FileUpload;
+
     public function getPackage(Request $request)
     {
         $user = auth()->user();
@@ -23,6 +25,7 @@ class PackagesController extends Controller
             'name' => 'required|string',
             'description' => 'nullable|string',
             'discount' => 'nullable|string',
+            'image' => 'required',
             'amount' => 'required|integer',
             'type' => 'required|in:Monthly,Yearly',
             'status' => 'required|in:Active,Blocked,Draft',
@@ -34,7 +37,12 @@ class PackagesController extends Controller
         $user = auth()->user();
         $data['user_id'] = $user->id;
         $data['date'] = \Carbon\Carbon::today();
-        
+
+        if ($request->hasFile('image')) {
+            $pathToUpload = 'uploads/package/';
+            $file = $request->file('image');
+            $data['image'] = $this->uploadFile($pathToUpload, $file);
+        }
         Packages::create($data);
         return response(['status' => 'success','msg'=>"Package created successfully"],200);
         

@@ -47,8 +47,9 @@ class AppController extends Controller
 
             return response()->json([
                 'message' => 'User register successfully',
+                'token' => $token,
                 'user' => new UserResource($user), // you can ommit this
-            ])->header('token', $token);       
+            ]);       
         }
         
         } catch (\Exception $e) {         
@@ -75,7 +76,7 @@ class AppController extends Controller
 
     protected function respondWithToken($token)
     {
-        return response()->json($this->respondWithTokenDetails($token))->header('token', $token);
+        return response()->json($this->respondWithTokenDetails($token));
     }
 
     protected function respondWithTokenDetails($token)
@@ -83,6 +84,7 @@ class AppController extends Controller
         return [
             'user' => new UserResource($this->guard()->user()),
             'token_type' => 'bearer',
+            'token' => $token,
             'expires_in' => $this->guard()->factory()->getTTL() * 60
 
         ];
@@ -126,6 +128,7 @@ class AppController extends Controller
                 $file = $request->file('profile');
                 $data['profile'] = $this->uploadFile($pathToUpload, $file);
             }
+            
             if ($request->hasFile('banner')) {
                 $pathToUpload = 'uploads/user/';
                 $file = $request->file('banner');
