@@ -54,5 +54,37 @@ class PackagesController extends Controller
         }
     }
 
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            
+            'type' => 'required|string|in:Monthly,3Month,6Month,Yearly',
+            'name' => 'required|string',
+            'description' => 'required|string',
+            'amount' => 'required|numeric|min:0',
+            'status' => 'required|string|in:Active,Blocked,Draft',
+        
+        ]);
+
+        $data = $request->except('_token');
+
+        try {
+
+            $package = Packages::findOrFail($id);          
+            $package->update($data);
+
+            
+            return response(['status' => 'success','msg'=>'Packages updated successfully'],200);
+           
+            
+        } catch (\Exception $e) {
+            
+            return response(['status' => 'success','msg'=>$e->getMessage()],401);
+            
+        }
+
+
+    }
+
    
 }

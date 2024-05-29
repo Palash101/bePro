@@ -20,5 +20,9 @@ Route::group([
 ], function ($router) {
     Route::post('/add','PostController@addPost');
     Route::get('/','PostController@getPost');
+    Route::post('/{id}/update','PostController@update');
+    Route::post('/{id}/comment','PostController@addComment');
+    Route::post('{id}/like','PostController@addLike');
+    Route::post('{id}/unlike','PostController@UnLike');
 });
 

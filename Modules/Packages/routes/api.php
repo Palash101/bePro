@@ -22,4 +22,5 @@ Route::group([
 ], function ($router) {
     Route::get('/','PackagesController@getPackage');
     Route::post('/add','PackagesController@addPackage');
+    Route::post('/{id}/update','PackagesController@update');
 });
