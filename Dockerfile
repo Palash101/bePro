@@ -14,13 +14,15 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     git \
-    curl
+    curl \
+    libonig-dev
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -31,8 +33,8 @@ COPY . .
 # Install application dependencies
 RUN composer install --optimize-autoloader --no-dev
 
-# Copy existing application directory permissions
-COPY --chown=www-data:www-data . /var/www
+# Set permissions
+RUN chown -R www-data:www-data /var/www
 
 # Expose port 9000 and start php-fpm server
 EXPOSE 9000
