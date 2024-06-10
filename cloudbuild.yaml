@@ -1,0 +1,8 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/procreators/laravel-app', '.']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/	procreators/laravel-app']
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: ['run', 'deploy', 'laravel-app', '--image', 'gcr.io/	procreators/laravel-app', '--platform', 'managed', '--region', 'ap-south1', '--allow-unauthenticated']
+timeout: '1200s'
