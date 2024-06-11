@@ -34,7 +34,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Copy application code
 COPY . .
 
-COPY .env .env
+COPY gcp_config/.env .env
 
 
 # Install application dependencies
