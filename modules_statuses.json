@@ -1,4 +1,5 @@
 {
     "Packages": true,
-    "Post": true
+    "Post": true,
+    "Theme": true
 }

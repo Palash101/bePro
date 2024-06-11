@@ -20,7 +20,9 @@ Route::group([
 ], function ($router) {
     Route::post('login', 'App\Http\Controllers\AppController@login');
     Route::post('register', 'App\Http\Controllers\AppController@register');
+    
 });
+
 
 Route::group([
     'middleware' => ['cors','auth:api','user:active'],
@@ -28,5 +30,6 @@ Route::group([
 ], function ($router) {
     Route::get('profile', 'App\Http\Controllers\AppController@profile');
     Route::post('profile/update', 'App\Http\Controllers\AppController@profileUpdate');
+    Route::post('check-domain', 'App\Http\Controllers\AppController@checkSubdomian');
 });
 

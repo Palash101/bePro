@@ -10,7 +10,7 @@ use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 use Carbon\Carbon;
-
+use Modules\Theme\App\Models\Theme;
 class User extends Authenticatable implements JWTSubject {
 
     use Notifiable,
@@ -25,7 +25,8 @@ class User extends Authenticatable implements JWTSubject {
     protected $fillable = [
         'name',
         'email',
-        'password','username','gender','profile','banner','password','facebook_id','google_id','dob','status','address','phone'
+        'password','username','gender','profile','banner','password','facebook_id','google_id','dob','status','address','phone','subdomain'
+        ,'business_name','members','theme_id','self','category'
     ];
     
     protected $guard_name = 'api';
@@ -70,6 +71,20 @@ class User extends Authenticatable implements JWTSubject {
         return [];
     }
 
+        public function theme()
+        {
+            return $this->belongsTo(Theme::class,'theme_id')->select('id','name','image','description','type');
+        }
+
+        public function onboarding()
+        {
+            
+            if($this->business_name && $this->members && $this->theme && $this->self && $this->subdomain && $this->category){
+                return true;
+            }else{
+                return false;
+            }
+        }
    
 
     

@@ -9,9 +9,12 @@ use Auth;
 use JWTAuth;
 use App\Http\Resources\UserResource;
 use App\Http\Traits\FileUpload;
+use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Response;
+use App\Http\Traits\Domain;
 class AppController extends Controller
 {
-    use FileUpload;
+    use FileUpload,Domain;
 
     public function __construct()
     {    
@@ -74,13 +77,49 @@ class AppController extends Controller
         return response()->json(['error' => 'Unauthorized'], 401);
     }
 
+
+    public function checkSubdomian(Request $request)    {   
+       
+
+        
+        try {
+            $user = $this->guard()->user();
+            $subdomain = $request->domain;
+            $checkSubdomain = User::where('subdomain',$subdomain)->first();
+            
+            if(!empty($checkSubdomain)){
+                return response(['status' => 'error','msg' => 'The domain name you entered already exists; please choose a different one.'],401); 
+            }else{
+                $user->subdomain = $subdomain;
+                $user->save();
+                $body = [
+                    "name" => "$subdomain.beprocreators.com"                   
+                ];
+                $encodedData = json_encode($body);
+                $this->subDomainCheck($encodedData); 
+                
+                return response(['status' => 'success','msg' => 'Congratulations! Your domain has been successfully added.'],200); 
+            }
+        
+        } catch (\Exception $e) {
+            
+              return response(['status' => 'error','msg' => 'Something went wrong','dev_msg' => $e->getMessage()],404);
+        }
+    }
+
     protected function respondWithToken($token)
     {
-        return response()->json($this->respondWithTokenDetails($token));
+        
+    $minutes = 60;
+    $domain = "beprocrators.com";
+    $response = new Response('Set Cookie');
+   
+        return response()->json($this->respondWithTokenDetails($token))->withCookie(cookie('token', $token, $minutes, '/', null, false, false));
     }
 
     protected function respondWithTokenDetails($token)
     {
+        
         return [
             'user' => new UserResource($this->guard()->user()),
             'token_type' => 'bearer',

@@ -25,7 +25,13 @@ class UserResource extends JsonResource
             'dob' => $this->dob,
             'id' => $this->id,
             'phone' => $this->phone,
+            'business_name' => $this->business_name,
+            'members' => $this->members,
+            'theme_id' => $this->theme,
+            'self' => $this->self,
+            'subdomain' => $this->subdomain,
+            'category' => $this->category,
+            'onboarding' => $this->onboarding(),
         ];
     }
-
 }
