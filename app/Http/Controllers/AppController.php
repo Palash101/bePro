@@ -84,7 +84,7 @@ class AppController extends Controller
         
         try {
             $user = $this->guard()->user();
-            $subdomain = $request->domain;
+            $subdomain = "$request->domain.beprocreators.com";
             $checkSubdomain = User::where('subdomain',$subdomain)->first();
             
             if(!empty($checkSubdomain)){
@@ -93,7 +93,7 @@ class AppController extends Controller
                 $user->subdomain = $subdomain;
                 $user->save();
                 $body = [
-                    "name" => "$subdomain.beprocreators.com"                   
+                    "name" => $subdomain                   
                 ];
                 $encodedData = json_encode($body);
                 $this->subDomainCheck($encodedData); 
