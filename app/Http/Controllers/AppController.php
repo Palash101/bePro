@@ -12,6 +12,7 @@ use App\Http\Traits\FileUpload;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Response;
 use App\Http\Traits\Domain;
+
 class AppController extends Controller
 {
     use FileUpload,Domain;
@@ -24,7 +25,7 @@ class AppController extends Controller
     public function register(Request $request)
     {
        $request->validate([
-        'email' => 'required|email|unique:users',
+        'email' => 'required|email',
         //'username' => 'required|username|unique:users',
         'password' => 'required|min:8'
         ]);
@@ -33,7 +34,11 @@ class AppController extends Controller
         try {
 
         $data = $request->all();           
-
+        $checkUser = User::whereEmail($request->email)->where('subdomain','!=',null)->first(); 
+        if($checkUser){
+            return response(['status' => 'error','message' => 'The email address you entered is already registered.'],403);    
+        }
+        
         $data['password'] = bcrypt($data['password']); 
         $data['status'] = 1; 
 
@@ -66,7 +71,7 @@ class AppController extends Controller
        
         $credentials = $request->only('email', 'password');        
         $user = User::where('email',$credentials['email'])->first();               
-        $roles = Role::with(['permissions'])->whereIn('name',['User'])->get(); 
+        $roles = Role::with(['permissions'])->whereIn('name',['Creator'])->get(); 
         
         if ($user && $user->hasRole($roles) &&  $user->status  && $token = $this->guard()->attempt($credentials)) {
        
@@ -80,7 +85,9 @@ class AppController extends Controller
 
     public function checkSubdomian(Request $request)    {   
        
-
+        $request->validate([
+            'domain' => 'required',
+            ]);
         
         try {
             $user = $this->guard()->user();

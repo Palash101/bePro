@@ -18,11 +18,11 @@ Route::group([
     'middleware' => ['cors','auth:api','user:active'],
     'prefix' => 'post'
 ], function ($router) {
-    Route::post('/add','PostController@addPost');
-    Route::get('/','PostController@getPost');
-    Route::post('/{id}/update','PostController@update');
-    Route::post('/{id}/comment','PostController@addComment');
-    Route::post('{id}/like','PostController@addLike');
-    Route::post('{id}/unlike','PostController@UnLike');
+    Route::post('/add','Creator\PostController@addPost');
+    Route::get('/','Creator\PostController@getPost');
+    Route::post('/{id}/update','Creator\PostController@update');
+    Route::post('/{id}/comment','Creator\PostController@addComment');
+    Route::post('{id}/like','Creator\PostController@addLike');
+    Route::post('{id}/unlike','Creator\PostController@UnLike');
 });
 

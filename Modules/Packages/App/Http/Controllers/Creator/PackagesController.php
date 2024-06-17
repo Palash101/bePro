@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Packages\App\Http\Controllers;
+namespace Modules\Packages\App\Http\Controllers\Creator;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Modules\Packages\App\Models\Packages;
 use App\Http\Traits\FileUpload;
+
 class PackagesController extends Controller
 {
     use FileUpload;

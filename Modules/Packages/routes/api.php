@@ -20,7 +20,14 @@ Route::group([
     'middleware' => ['cors','auth:api','user:active'],
     'prefix' => 'packages'
 ], function ($router) {
-    Route::get('/','PackagesController@getPackage');
-    Route::post('/add','PackagesController@addPackage');
-    Route::post('/{id}/update','PackagesController@update');
+    Route::get('/','Creator\PackagesController@getPackage');
+    Route::post('/add','Creator\PackagesController@addPackage');
+    Route::post('/{id}/update','Creator\PackagesController@update');
+});
+
+Route::group([
+    'middleware' => ['cors','auth:api','user:active'],
+    'prefix' => 'user'
+], function ($router) {
+    Route::get('/package/purchase','User\PackagesController@getPackage');
 });

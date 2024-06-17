@@ -20,8 +20,17 @@ Route::group([
 ], function ($router) {
     Route::post('login', 'App\Http\Controllers\AppController@login');
     Route::post('register', 'App\Http\Controllers\AppController@register');
-    
 });
+
+
+Route::group([
+    'middleware' => ['cors'],
+    'prefix' => 'auth/user'
+], function ($router) {
+    Route::post('login', 'App\Http\Controllers\UserController@login');
+    Route::post('register', 'App\Http\Controllers\UserController@register');
+});
+
 
 
 Route::group([
