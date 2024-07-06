@@ -1,5 +1,7 @@
 {
     "Packages": true,
     "Post": true,
-    "Theme": true
+    "Theme": true,
+    "Creator": true,
+    "Products": true
 }

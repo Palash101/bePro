@@ -19,7 +19,7 @@ class AppController extends Controller
 
     public function __construct()
     {    
-        $this->middleware('auth:api', ['except' => ['login','register']]);
+        $this->middleware('auth:api', ['except' => ['login','register','refresh']]);
     }
 
     public function register(Request $request)
@@ -82,6 +82,10 @@ class AppController extends Controller
         return response()->json(['error' => 'Unauthorized'], 401);
     }
 
+    public function refresh()
+    {
+        return $this->respondWithToken($this->guard()->refresh());
+    }
 
     public function checkSubdomian(Request $request)    {   
        

@@ -20,9 +20,17 @@ Route::group([
 ], function ($router) {
     Route::post('/add','Creator\PostController@addPost');
     Route::get('/','Creator\PostController@getPost');
+    Route::get('/{id}/show','Creator\PostController@show');
     Route::post('/{id}/update','Creator\PostController@update');
     Route::post('/{id}/comment','Creator\PostController@addComment');
     Route::post('{id}/like','Creator\PostController@addLike');
     Route::post('{id}/unlike','Creator\PostController@UnLike');
+});
+
+Route::group([
+    //'middleware' => ['cors','auth:api','user:active'],
+    'prefix' => 'user'
+], function ($router) {
+    Route::get('/getPost','User\PostController@getPost');
 });
 

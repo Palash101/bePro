@@ -18,9 +18,10 @@ class PostController extends Controller
     public function getPost(Request $request)
     {
         $user = auth()->user();
-        $packages = Post::whereUserId($user->id)->orderBy('created_at','desc')->get();
-        return response(['status' => 'success','packages'=>$packages],200);
+        $post = Post::with('attachments')->whereUserId($user->id)->orderBy('created_at','desc')->get();
+        return response(['status' => 'success','post'=>$post],200);
     }
+
 
     public function addPost(Request $request)
     {
@@ -40,14 +41,9 @@ class PostController extends Controller
         $data['user_id'] = $user->id;
         $data['status'] = 'Draft';
         
+      $post =  Post::create($data);
+        return response(['status' => 'success','id'=>$post->id,'msg'=>"Post created successfully"],200);
         
-        
-        
-
-        Post::create($data);
-        return response(['status' => 'success','msg'=>"Post created successfully"],200);
-        
-
         } catch (\Exception $e) {
            
             return response(['status' => 'error','msg'=>$e->getMessage()],401);
@@ -59,11 +55,11 @@ class PostController extends Controller
     {
         $request->validate([
             
-            'title' => 'required|string',
-            'description' => 'nullable|string',
+           // 'title' => 'required|string',
+            //'description' => 'nullable|string',
             'type' => 'required|in:Paid,Free',
             'postType' => 'required|in:Text,Video,Audio,Image,Link,Poll,Livestream',
-            'status' => 'required|in:Active,Blocked,Draft',
+           // 'status' => 'required|in:Active,Blocked,Draft',
         
         ]);
 
@@ -71,23 +67,24 @@ class PostController extends Controller
 
         try {
 
-            $package = Post::findOrFail($id);  
-            foreach($request->attachments as $attachments){
-                $url = $attachments;
-                $image = Image::make($url);
-                $image->blur(100);
-                $path = 'images/' . uniqid() . '.jpg';
-                Storage::disk('public')->put($path, (string) $image->encode());
-                $urlAttachment = Storage::disk('public')->url($path);
+            $post = Post::findOrFail($id);  
+            foreach($request->postImages as $attachments){
+                // $url = $attachments;
+                // $image = Image::make($url);
+                // $image->blur(100);
+                // $path = 'images/' . uniqid() . '.jpg';
+                // Storage::disk('public')->put($path, (string) $image->encode());
+                // $urlAttachment = Storage::disk('public')->url($path);
                 
                     $attachmentsSave = [
-                        'post_id' => $package->id,
+                        'post_id' => $post->id,
                         'attachment' => $attachments,
-                        'blur_attachment' => $urlAttachment,
+                       // 'blur_attachment' => $urlAttachment,
                         ];                
                         Attachment::create($attachmentsSave);
-                }        
-            $package->update($data);            
+                }    
+               $data['preview_image'] =  $request['previewImage'];    
+            $post->update($data);            
             return response(['status' => 'success','msg'=>'Post updated successfully'],200);
            
             
@@ -154,5 +151,20 @@ class PostController extends Controller
         } catch (\Exception $e) {
             return response(['status' => 'error','msg'=>$e->getMessage()],401);
         }
+    }
+
+    public function show($id)
+    {
+        try {
+            $user = auth()->user();
+            $post = Post::whereUserId($user->id)->with('attachments')->find($id);
+            return response(['status' => 'success','post'=>$post],200);
+
+        } catch (\Exception $e) {
+            
+            return response(['status' => 'error','msg'=>$e->getMessage()],401);
+
+        }
+
     }
 }

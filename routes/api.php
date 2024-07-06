@@ -20,6 +20,7 @@ Route::group([
 ], function ($router) {
     Route::post('login', 'App\Http\Controllers\AppController@login');
     Route::post('register', 'App\Http\Controllers\AppController@register');
+    Route::post('refresh', 'App\Http\Controllers\AppController@refresh');
 });
 
 
@@ -41,4 +42,5 @@ Route::group([
     Route::post('profile/update', 'App\Http\Controllers\AppController@profileUpdate');
     Route::post('check-domain', 'App\Http\Controllers\AppController@checkSubdomian');
 });
+
 
