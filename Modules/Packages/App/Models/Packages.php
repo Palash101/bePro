@@ -11,6 +11,6 @@ class Packages extends Model
 {
     use HasFactory,SoftDeletes;
     protected $table = 'packages';
-    protected $fillable = ['name','user_id','description','amount','date','discount','type','status','image'];
+    protected $fillable = ['name','user_id','description','amount','date','discount','type','status','image','UniqueId'];
 
 }

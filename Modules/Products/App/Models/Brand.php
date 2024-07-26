@@ -11,9 +11,9 @@ class Brand extends Model
     use HasFactory;
 
     protected $table = 'pro_brands';
-    protected $fillable = ['creator_id','name','image','descriptions','status'];
+    protected $fillable = ['creator_id','name','image','descriptions','status','UniqueId'];
     protected $hidden = [
-        'creator_id', 
+        'creator_id','id' 
     ];
     
     

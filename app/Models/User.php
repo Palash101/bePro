@@ -26,8 +26,9 @@ class User extends Authenticatable implements JWTSubject {
         'name',
         'email',
         'password','username','gender','profile','banner','password','facebook_id','google_id','dob','status','address','phone','subdomain'
-        ,'business_name','members','theme_id','self','category','parent_id'
+        ,'business_name','members','theme_id','self','category','parent_id','UniqueId'
     ];
+
     
     protected $guard_name = 'api';
 
@@ -38,7 +39,7 @@ class User extends Authenticatable implements JWTSubject {
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password', 'remember_token','id'
     ];
 
     /**

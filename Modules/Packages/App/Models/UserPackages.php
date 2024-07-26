@@ -11,5 +11,5 @@ class UserPackages extends Model
     use HasFactory;
 
     protected $table = 'user_packages';
-    protected $fillable = ['package_id','user_id','client_id','amount','name','discount','purchase_date','expire_date'];
+    protected $fillable = ['package_id','user_id','client_id','amount','name','discount','purchase_date','expire_date','UniqueId'];
 }

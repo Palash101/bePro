@@ -11,5 +11,5 @@ class BankDetails extends Model
     use HasFactory;
 
     protected $table = 'bank_details';
-    protected $fillable = ['user_id','bank_name','account_name','ifsc_code','account_number'];
+    protected $fillable = ['user_id','bank_name','account_name','ifsc_code','account_number','UniqueId'];
 }

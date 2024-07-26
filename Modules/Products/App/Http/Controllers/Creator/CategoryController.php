@@ -8,9 +8,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Modules\Products\App\Models\Category;
 use App\Http\Traits\FileUpload;
+use App\Http\Traits\UniqueId;
 class CategoryController extends Controller
 {
-    use FileUpload;
+    use FileUpload,UniqueId;
     /**
      * Display a listing of the resource.
      * @return Response
@@ -59,8 +60,9 @@ class CategoryController extends Controller
         ]); 
         $data = $request->except(['_token']);
         $user = auth()->user();
-        
+        $unique =  $this->generateUniqueId();
         $data['creator_id'] = $user->id;
+        $data['UniqueId'] = $unique;
         Category::create($data);
 
         
@@ -76,7 +78,7 @@ class CategoryController extends Controller
     public function show($id)
     {
         $user = auth()->user();
-        $categories = Category::whereCreatorId($user->id)->find($id);
+        $categories = Category::whereCreatorId($user->id)->where('UniqueId', $id)->first();
         return response (['status'=>'success','categories'=>$categories],200);
     }
 
@@ -99,7 +101,7 @@ class CategoryController extends Controller
          try {
             $data = $request->except(['_token']);
             $user = auth()->user();
-            $categories = Category::whereCreatorId($user->id)->findOrFail($id);
+            $categories = Category::whereCreatorId($user->id)->where('UniqueId', $id)->first();
 
             
  
@@ -135,7 +137,7 @@ class CategoryController extends Controller
     {
         try {
             $user = auth()->user();
-            $categories = Category::whereCreatorId($user->id)->findOrFail($id);
+            $categories = Category::whereCreatorId($user->id)->where('UniqueId', $id)->first();
             $categories->delete();
             return response(['status' => 'success','msg'=>'Category deleted successfully'],200);
          } catch (\Exception $e) {
@@ -148,7 +150,7 @@ class CategoryController extends Controller
     {
         try {
             $user = auth()->user();
-            $category = Category::whereCreatorId($user->id)->findOrFail($id);
+            $category = Category::whereCreatorId($user->id)->where('UniqueId', $id)->first();
             if($category->status == 'Active'){
                 $category->status = 'Block';
             }else{

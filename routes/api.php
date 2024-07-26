@@ -38,9 +38,12 @@ Route::group([
     'middleware' => ['cors','auth:api','user:active'],
     'prefix' => 'auth'
 ], function ($router) {
+    Route::post('social/details', 'App\Http\Controllers\AppController@addSocialDetails');
+    Route::get('social/details', 'App\Http\Controllers\AppController@getSocialDetails');
     Route::get('profile', 'App\Http\Controllers\AppController@profile');
     Route::post('profile/update', 'App\Http\Controllers\AppController@profileUpdate');
     Route::post('check-domain', 'App\Http\Controllers\AppController@checkSubdomian');
 });
+
 
 

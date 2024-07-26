@@ -9,8 +9,11 @@ use Spatie\Permission\Models\Role;
 use App\Http\Resources\UserResource;
 use Auth;
 use JWTAuth;
+use App\Http\Traits\UniqueId;
+
 class UserController extends Controller
 {
+    use UniqueId;
     public function __construct()
     {    
         $this->middleware('auth:api', ['except' => ['login','register']]);
@@ -28,7 +31,7 @@ class UserController extends Controller
         try {
 
         $data = $request->all();           
-
+        $unique =  $this->generateUniqueId();
         $data['password'] = bcrypt($data['password']); 
         $data['status'] = 1; 
 
@@ -38,6 +41,7 @@ class UserController extends Controller
         }
        
         $data['parent_id'] = $checkSubdomain->id;
+        $data['UniqueId'] = $unique;
         $user = User::create($data);             
         $role = Role::find(1);
         $user->assignRole($role);

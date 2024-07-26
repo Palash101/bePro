@@ -12,9 +12,12 @@ use Modules\Post\App\Models\Like;
 use Modules\Post\App\Models\Attachment;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Storage;
+use App\Models\User;
+use App\Http\Traits\UniqueId;
 
 class PostController extends Controller
 {
+    use UniqueId;
     public function getPost(Request $request)
     {
         $user = auth()->user();
@@ -22,6 +25,17 @@ class PostController extends Controller
         return response(['status' => 'success','post'=>$post],200);
     }
 
+    public function getPostbyDomain(Request $request)
+    {
+        $request->validate([
+            'domain' => 'required|string|exists:users,subdomain',
+        ]);
+        $checkSubdomain = User::where('subdomain',$request->domain)->first();
+        $post = Post::with('attachments')->whereUserId($checkSubdomain->id)->orderBy('created_at','desc')->get();
+        return response(['status' => 'success','post'=>$post],200);
+    }
+
+   
 
     public function addPost(Request $request)
     {
@@ -38,11 +52,12 @@ class PostController extends Controller
 
         try {
         $user = auth()->user();
+        $unique =  $this->generateUniqueId();
         $data['user_id'] = $user->id;
         $data['status'] = 'Draft';
-        
-      $post =  Post::create($data);
-        return response(['status' => 'success','id'=>$post->id,'msg'=>"Post created successfully"],200);
+        $data['UniqueId'] = $unique;
+        $post =  Post::create($data);
+        return response(['status' => 'success','id'=>$unique,'msg'=>"Post created successfully"],200);
         
         } catch (\Exception $e) {
            
@@ -67,18 +82,19 @@ class PostController extends Controller
 
         try {
 
-            $post = Post::findOrFail($id);  
+            $post = Post::where('UniqueId', $id)->first();  
+           //dd() dd($request);
+           if(!empty($request->postImages)){
+           $deleted = Attachment::wherePostId($post->id)->delete();
+           }
             foreach($request->postImages as $attachments){
-                // $url = $attachments;
-                // $image = Image::make($url);
-                // $image->blur(100);
-                // $path = 'images/' . uniqid() . '.jpg';
-                // Storage::disk('public')->put($path, (string) $image->encode());
-                // $urlAttachment = Storage::disk('public')->url($path);
                 
+                $unique =  $this->generateUniqueId();
                     $attachmentsSave = [
                         'post_id' => $post->id,
+                        'UniqueId' => $unique,
                         'attachment' => $attachments,
+                        
                        // 'blur_attachment' => $urlAttachment,
                         ];                
                         Attachment::create($attachmentsSave);
@@ -157,7 +173,7 @@ class PostController extends Controller
     {
         try {
             $user = auth()->user();
-            $post = Post::whereUserId($user->id)->with('attachments')->find($id);
+            $post = Post::whereUserId($user->id)->where('UniqueId', $id)->with('attachments')->first();
             return response(['status' => 'success','post'=>$post],200);
 
         } catch (\Exception $e) {
@@ -166,5 +182,32 @@ class PostController extends Controller
 
         }
 
+    }
+
+    public function attachmentsDelete(Request $request, $id)
+    {
+        $data = $request->except('_token');
+        try {
+       
+        $attachment = Attachment::find($id);
+        $attachment->delete();
+
+            return response(['status' => 'success','msg'=>"Images deleted successfully"],200);
+        
+        } catch (\Exception $e) {
+            return response(['status' => 'error','msg'=>$e->getMessage()],401);
+        }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            $product = Post::where('UniqueId', $id)->first();
+            $product->delete();
+            return response(['status' => 'success','msg'=>'post deleted successfully'],200);
+         } catch (\Exception $e) {
+             return response(['status' => 'error','msg'=> $e->getMessage()],401);
+
+         } 
     }
 }

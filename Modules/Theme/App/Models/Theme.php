@@ -11,7 +11,11 @@ class Theme extends Model
     use HasFactory;
 
     protected $table = 'theme';
-    protected $fillable = ['name','description','image','type','status'];
+    protected $fillable = ['name','description','image','type','status','UniqueId'];
+
+    protected $hidden = [
+        'id'
+    ];
     
     
 }

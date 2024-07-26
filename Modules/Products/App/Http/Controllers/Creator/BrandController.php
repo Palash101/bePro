@@ -8,9 +8,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Modules\Products\App\Models\Brand;
 use App\Http\Traits\FileUpload;
+use App\Http\Traits\UniqueId;
 class BrandController extends Controller
 {
-    use FileUpload;
+    use FileUpload,UniqueId;
     /**
      * Display a listing of the resource.
      * @return Response
@@ -58,7 +59,10 @@ class BrandController extends Controller
             'image' => 'required',
            
         ]); 
+        
         $data = $request->except(['_token']);
+        $unique =  $this->generateUniqueId();
+        
         $user = auth()->user();
         if($request->hasFile('image'))
         { 
@@ -67,6 +71,7 @@ class BrandController extends Controller
         $data['image'] = $this->uploadFile($pathToUpload,$file);
         }
         $data['creator_id'] = $user->id;
+        $data['UniqueId'] = $unique;
         Brand::create($data);
 
         
@@ -82,7 +87,8 @@ class BrandController extends Controller
     public function show($id)
     {
         $user = auth()->user();
-        $brands = Brand::whereCreatorId($user->id)->find($id);
+        
+        $brands = Brand::whereCreatorId($user->id)->where('UniqueId', $id)->first();
         return response (['status'=>'success','brands'=>$brands],200);
     }
 
@@ -105,7 +111,7 @@ class BrandController extends Controller
          try {
             $data = $request->except(['_token']);
             $user = auth()->user();
-            $brands = Brand::whereCreatorId($user->id)->findOrFail($id);
+            $brands = Brand::whereCreatorId($user->id)->where('UniqueId', $id)->first();
 
             if($request->hasFile('image'))
             { 
@@ -146,7 +152,7 @@ class BrandController extends Controller
     {
         try {
             $user = auth()->user();
-            $brands = Brand::whereCreatorId($user->id)->findOrFail($id);
+            $brands = Brand::whereCreatorId($user->id)->where('UniqueId', $id)->first();
             $brands->delete();
             return response(['status' => 'success','msg'=>'Brands deleted successfully'],200);
          } catch (\Exception $e) {
@@ -159,7 +165,7 @@ class BrandController extends Controller
     {
         try {
             $user = auth()->user();
-            $brand = Brand::whereCreatorId($user->id)->findOrFail($id);
+            $brand = Brand::whereCreatorId($user->id)->where('UniqueId', $id)->first();
             if($brand->status == 'Active'){
                 $brand->status = 'Block';
             }else{

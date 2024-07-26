@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\SocialDetails;
 use Spatie\Permission\Models\Role;
 use Auth;
 use JWTAuth;
@@ -12,10 +13,10 @@ use App\Http\Traits\FileUpload;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Response;
 use App\Http\Traits\Domain;
-
+use App\Http\Traits\UniqueId;
 class AppController extends Controller
 {
-    use FileUpload,Domain;
+    use FileUpload,Domain,UniqueId;
 
     public function __construct()
     {    
@@ -38,9 +39,10 @@ class AppController extends Controller
         if($checkUser){
             return response(['status' => 'error','message' => 'The email address you entered is already registered.'],403);    
         }
-        
+        $unique =  $this->generateUniqueId();
         $data['password'] = bcrypt($data['password']); 
         $data['status'] = 1; 
+        $data['UniqueId'] = $unique;
 
         $user = User::create($data);             
         $role = Role::find(2);
@@ -208,6 +210,66 @@ class AppController extends Controller
         return response(['status' => 'error','message' => 'Something went wrong!','dev_msg' => $e->getMessage()],403);        
 
         }
+    }
+
+    public function addSocialDetails(Request $request)
+    {
+        $user = auth()->user();
+        $request->validate([
+            'userDetails' => 'required|string',
+            'userToken' => 'required|string',
+            'LongLiveToken' => 'required|string',
+            'pageAccessToken' => 'required|string',
+            'pageId' => 'required|string',
+            ]);
+        try {
+        
+            $checkSocial = SocialDetails::where('creator_id',$user->id)->first();
+            if(empty($checkSocial)){
+                $social = new SocialDetails;
+                $social['creator_id'] = $user->id;
+                $social['user_id'] = $request->user_id;
+                $social['userDetails'] = $request->userDetails;
+                $social['userToken'] = $request->userToken;
+                $social['LongLiveToken'] = $request->LongLiveToken;
+                $social['pageAccessToken'] = $request->pageAccessToken;
+                $social['pageId'] = $request->pageId;           
+                $social->save();
+            }else{
+            $checkSocial['userDetails'] = $request->userDetails;
+            $checkSocial['userToken'] = $request->userToken;
+            $checkSocial['LongLiveToken'] = $request->LongLiveToken;
+            $checkSocial['pageAccessToken'] = $request->pageAccessToken;
+            $checkSocial['pageId'] = $request->pageId;   
+            $social['user_id'] = $request->user_id;        
+            $checkSocial->save();
+            }
+
+            
+            return response(['status' => 'success' ,'message' => 'Details added successfully'], 200);
+        
+
+        } catch (\Exception $e) {
+         
+        return response(['status' => 'error','message' => 'Something went wrong!','dev_msg' => $e->getMessage()],403);        
+
+        }
+    }
+
+
+    public function getSocialDetails(Request $request)
+    {   
+        $user = $this->guard()->user();
+        try {
+            $details = SocialDetails::where('creator_id',$user->id)->first();
+            return response(['status' => 'success','details' =>$details],200);
+        
+        } catch (\Exception $e) {
+            
+              return response(['status' => 'error','msg' => 'Something went wrong','dev_msg' => $e->getMessage()],404);
+
+        }
+
     }
 }
 

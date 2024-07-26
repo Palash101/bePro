@@ -25,6 +25,8 @@ Route::group([
     Route::post('/{id}/comment','Creator\PostController@addComment');
     Route::post('{id}/like','Creator\PostController@addLike');
     Route::post('{id}/unlike','Creator\PostController@UnLike');
+    Route::post('images/{id}/delete','Creator\PostController@attachmentsDelete');
+    Route::post('/{id}/delete', 'Creator\PostController@destroy');
 });
 
 Route::group([
@@ -32,5 +34,13 @@ Route::group([
     'prefix' => 'user'
 ], function ($router) {
     Route::get('/getPost','User\PostController@getPost');
+});
+
+
+Route::group([
+    'prefix' => 'getPost',
+    'middleware' => ['cors'],
+], function ($router) {
+    Route::post('/', 'Creator\PostController@getPostbyDomain');
 });
 

@@ -25,7 +25,7 @@ Route::group([
     Route::post('/store', 'Creator\BrandController@store');
     Route::get('/{id}/show', 'Creator\BrandController@show');
     Route::post('/{id}/update', 'Creator\BrandController@update');
-    Route::get('/{id}/status', 'Creator\BrandController@changeStatus');
+    Route::post('/{id}/status', 'Creator\BrandController@changeStatus');
     Route::post('/{id}/delete', 'Creator\BrandController@destroy');
 });
 
@@ -38,7 +38,7 @@ Route::group([
     Route::post('/store', 'Creator\CategoryController@store');
     Route::get('/{id}/show', 'Creator\CategoryController@show');
     Route::post('/{id}/update', 'Creator\CategoryController@update');
-    Route::get('/{id}/status', 'Creator\CategoryController@changeStatus');
+    Route::post('/{id}/status', 'Creator\CategoryController@changeStatus');
     Route::post('/{id}/delete', 'Creator\CategoryController@destroy');
 });
 
@@ -53,4 +53,12 @@ Route::group([
     Route::post('/{id}/update', 'Creator\ProductController@update');
     Route::post('/{id}/status', 'Creator\ProductController@changeStatus');
     Route::post('/{id}/delete','Creator\ProductController@destroy');
+    Route::post('/variant/{id}/delete','Creator\ProductController@variantDelete');
+});
+
+Route::group([
+    'prefix' => 'getProducts',
+    'middleware' => ['cors'],
+], function ($router) {
+    Route::post('/', 'Creator\ProductController@getPostbyDomain');
 });

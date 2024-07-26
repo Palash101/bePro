@@ -3,5 +3,6 @@
     "Post": true,
     "Theme": true,
     "Creator": true,
-    "Products": true
+    "Products": true,
+    "Course": true
 }

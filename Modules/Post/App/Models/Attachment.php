@@ -10,6 +10,6 @@ class Attachment extends Model
 {
     use HasFactory;
     protected $table = 'post_attachments';
-    protected $fillable = ['post_id','attachment','blur_attachment'];
+    protected $fillable = ['post_id','attachment','blur_attachment','UniqueId'];
 
 }

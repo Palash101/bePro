@@ -10,8 +10,8 @@ class Category extends Model
 {
 
     protected $table = 'pro_categories';
-    protected $fillable = ['creator_id','name','status'];
+    protected $fillable = ['creator_id','name','status','UniqueId'];
     protected $hidden = [
-        'creator_id', 
+        'creator_id','id' 
     ];
 }
